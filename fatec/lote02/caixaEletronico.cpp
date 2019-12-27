@@ -10,6 +10,8 @@ int bancos[4] = {0, 1, 2, 3};
 int maior_saque_banco[4] = {0, 0, 0, 0};
 int menor_saque_banco[4] = {10000, 10000, 10000, 10000};
 bool teve_saques = false;
+bool teve_recarga = false;
+bool usuario_logado = true;
 
 //media dos saques dos bancos
 float media_saques_banco[4] = {0, 0, 0, 0};
@@ -21,12 +23,19 @@ int quantidade_saques[4] = {0, 0, 0, 0};
 //valor total dos saques
 int valor_total_saques[4] = {0, 0, 0, 0};
 
-int valor_notas_total[6] = {400, 500, 500, 400, 500, 500};
+int valor_notas_total[6] = {0, 0, 0, 0, 0, 0};
+int qtd_notas_total[6] = {0, 0, 0, 0, 0, 0};
+
 int valor_notas[6] = {2, 5, 10, 20, 50, 100};
-int qtd_notas_total[6] = {200, 100, 50, 20, 10, 5};
 int qtd_notas_solicitadas[6] = {0, 0, 0, 0, 0, 0};
-int valor, escolha, i, j, z, escolha_banco;
+int valor, escolha, j, escolha_banco;
 int dinheiro_caixa;
+
+
+//valores originais dos arrays
+//int valor_notas_total[6] = {400, 500, 500, 400, 500, 500};
+//int qtd_notas_total[6] = {200, 100, 50, 20, 10, 5};
+
 
 void totalCaixa(){
   dinheiro_caixa = 0;
@@ -49,7 +58,7 @@ void menorSaque(int valor, int z){
 }
 
 void zerandoNotasSolicitadas(){
-  for(i = 0; i < 6; i++){
+  for(int i = 0; i < 6; i++){
     qtd_notas_solicitadas[i] = 0;
   }
 }
@@ -58,23 +67,26 @@ void retirarNotas(){
   totalCaixa();
   puts("Digite o codigo do seu banco, segundo:\n0 - Banco do Brasil\n1 - Santander\n2 - Itau\n3 - Caixa\n");
   scanf("%d", &escolha_banco);
-  for(z = 0; z < 4; z++){
+  for(int z = 0; z < 4; z++){
 
     if(z == escolha_banco){
 
       do{
         puts("Digite o valor que deseja sacar.");
         scanf("%d", &valor);
-        if(valor > dinheiro_caixa){
-          puts("EXCEDEU O LIMITE DO CAIXA\n");
-        }
-      }while(valor < 2 || valor > dinheiro_caixa);
+
+      }while(valor < 2);
+
+      if(valor > dinheiro_caixa){
+        puts("EXCEDEU O LIMITE DO CAIXA\n");
+        return;
+      }
 
       maiorSaque(valor, z);
       menorSaque(valor, z);
 
       puts("Por favor, selecione uma das opcoes, segundo:");
-      for(i=0;i < 6; i++){
+      for(int i=0;i < 6; i++){
         j = 0;
         while(j<=valor){
           if(j == valor){
@@ -90,7 +102,7 @@ void retirarNotas(){
       puts("Digite sua opcao:");
       scanf("%d", &escolha);
           if(escolha >= 0 && escolha < 6){
-              for(i = 0; i < 6; i++){
+              for(int i = 0; i < 6; i++){
                 if(i == escolha){
                   //decrementando o valor de notas total do caixa
                   valor_notas_total[i] -= (valor_notas[i] * qtd_notas_solicitadas[i]);
@@ -118,12 +130,6 @@ void retirarNotas(){
             }
     }
   }
-
-    //zerando o vetor de notas solicitadas
-    /*
-    for(i = 0; i < 6; i++){
-      qtd_notas_solicitadas[i] = 0;
-    }*/
     zerandoNotasSolicitadas();
 }
 
@@ -131,55 +137,81 @@ void retirarNotas(){
       if(teve_saques == false){
           puts("Ainda nao houve nenhum saque em nenhum banco.");
       }else{
-          for(i = 0; i < 4; i++){
+          for(int i = 0; i < 4; i++){
         //necessario montar essa condicao pois sem ela, se tiver um banco que nao teve saques, vai ocasionar em divisao ( 0 / 0 ), causando um erro...
             if(quantidade_saques[i] != 0){
                 media_saques_banco[i] = media_saques_banco[i] / quantidade_saques[i];
-                printf("Codigo do banco: %d\nValor total dos saques: %d\nMedia dos saques: %f\nMaior valor sacado:%d\nMenor valor sacado: %d\nQuantidade de saques realizados: %d\nSobras do caixa: %d.\n\n", bancos[i], valor_total_saques[i], media_saques_banco[i], maior_saque_banco[i], menor_saque_banco[i], quantidade_saques[i], dinheiro_caixa);
+                printf("Codigo do banco: %d\nValor total dos saques: %d\nMedia dos saques: %.2f\nMaior valor sacado:%d\nMenor valor sacado: %d\nQuantidade de saques realizados: %d\nSobras do caixa: %d.\n\n", bancos[i], valor_total_saques[i], media_saques_banco[i], maior_saque_banco[i], menor_saque_banco[i], quantidade_saques[i], dinheiro_caixa);
             }
           }
       }
   }
 
-  void carregarNotas(){
+void carregarNotas(){
   int nota, qtd_nota, resposta;
-        int i;
 
-          do{
-            puts("Escolha uma opcao de nota para carregar:");
+    do{
+      puts("Escolha uma opcao de nota para carregar:");
 
-              for(i = 0; i < 6; i++){
-                  printf("Opcao %d -> nota de %d;\n", i, valor_notas[i]);
-              }
+        for(int i = 0; i < 6; i++){
+            printf("Opcao %d -> nota de %d;\n", i, valor_notas[i]);
+        }
 
-              do{
-                puts("Digite abaixo sua opcao.");
-                scanf("%d", &nota);
+        do{
+          puts("Digite abaixo sua opcao.");
+          scanf("%d", &nota);
 
-                if(nota < 0 || nota > 5){
-                  puts("Você não digitou notas validas!");
-                }
-              }while(nota < 0 || nota > 5);
+          if(nota < 0 || nota > 5){
+            puts("Você não digitou notas validas!");
+          }
+        }while(nota < 0 || nota > 5);
 
-              do{
-                puts("Digite a quantidade de notas que voce deseja carregar (maximo permitido: 30 notas).");
-                scanf("%d", &qtd_nota);
+        do{
+          puts("Digite a quantidade de notas que voce deseja carregar (maximo permitido: 30 notas).");
+          scanf("%d", &qtd_nota);
 
-                if(qtd_nota > 30 || qtd_nota < 0){
-                  puts("Você não digitou uma quantidade valida!");
-                }
-              }while(qtd_nota > 30 || qtd_nota < 0);
+          if(qtd_nota > 30 || qtd_nota < 0){
+            puts("Você não digitou uma quantidade valida!");
+          }
+        }while(qtd_nota > 30 || qtd_nota < 0);
 
-              for(i = 0; i < 6; i++){
-                  if(nota == i){
-                      valor_notas_total[i] += (valor_notas[i] * qtd_nota);
-                      qtd_notas_total[i] += qtd_nota;
-                  }
-              }
-              puts("Deseja carregar mais notas? Se sim, digite 1. Senao, digite qualquer tecla.");
-              scanf("%d", &resposta);
-          }while(resposta == 1);
-          totalCaixa();
+        for(int i = 0; i < 6; i++){
+            if(nota == i){
+                valor_notas_total[i] += (valor_notas[i] * qtd_nota);
+                qtd_notas_total[i] += qtd_nota;
+            }
+        }
+        puts("Deseja carregar mais notas? Se sim, digite 1. Senao, digite qualquer tecla.");
+        scanf("%d", &resposta);
+
+    }while(resposta == 1);
+    totalCaixa();
+    usuario_logado = false;
+    puts("Logout realizado automaticamente.\n\n");
+}
+
+void mostraValoresBanco(){
+    for(int i = 0; i < 6; i++){
+      printf("Valor total das notas na posicao [%d] = %d.\n", i, valor_notas_total[i]);
+      printf("Quantidade de notas total na posicao [%d] = %d.\n\n", i, qtd_notas_total[i]);
+    }
+    usuario_logado = false;
+    puts("Logout realizado automaticamente.\n\n");
+}
+
+void realizarLogin(){
+  char senha[] = "12345";
+  char valor_digitado[6];
+  puts("Digite a senha para realizar login:");
+  scanf("%s", valor_digitado);
+
+  //se valor digitado = senha
+  if(strcmp(valor_digitado, senha) == 0){
+    puts("Login realizado com sucesso! Por seguranca, agora voce tem acesso a recarregar o caixa e ver os valores restantes apenas uma vez.");
+    usuario_logado = true;
+  }else{
+    puts("Senha invalida!");
+  }
 }
 
 //principal...
@@ -187,43 +219,64 @@ int main()
 {
     int escolha_switch, escolha_fim;
 
+    usuario_logado = false;
+
     while(escolha_switch != 9){
 
-        do{
-        puts("Menu Principal\n1 - Carregar Notas\n2 - Retirar Notas\n3 - Estatística\n9 - Fim");
+      do{
+        puts("Menu Principal\n1 - Carregar Notas (necessario login)\n2 - Retirar Notas\n3 - Estatistica\n4 - Visualizar Notas do Caixa (necessario login)\n5 - Realizar Login\n9 - Fim");
         scanf("%d", &escolha_switch);
 
-            switch(escolha_switch){
-                case 1:
-                    carregarNotas();
+        switch(escolha_switch){
+            case 1:
+                if(!usuario_logado){
+                  puts("Eh necessario estar logado para ter acesso a esse recurso.");
+                }else{
+                  carregarNotas();
+                }
                 break;
 
-                case 2:
-                    retirarNotas();
+            case 2:
+                totalCaixa();
+                if(dinheiro_caixa <= 1){
+                  puts("O Caixa esta vazio.");
+                }else{
+                  retirarNotas();
+                }
                 break;
 
-                case 3:
-                    mostrarEstatisticas();
+            case 3:
+                mostrarEstatisticas();
                 break;
 
-                case 9:
-                    puts("Tem certeza de que deseja sair? Digite 9 novamente para sair. Se quiser utilizar o sistema novamente, digite qualquer valor.");
-                    scanf("%d", &escolha_fim);
-                    break;
+            case 4:
+              if(!usuario_logado){
+                puts("Eh necessario estar logado para ter acesso a esse recurso.");
+              }else{
+                mostraValoresBanco();
+              }
+                break;
 
-                default:
-                puts("Opção inválida!\n");
+            case 5:
+                realizarLogin();
+                break;
 
-            }
+            case 9:
+                puts("Tem certeza de que deseja sair? Digite 9 novamente para sair. Se quiser utilizar o sistema novamente, digite qualquer valor.");
+                scanf("%d", &escolha_fim);
+                break;
 
-        }while(escolha_fim != 9);
-        puts("Obrigado por utilizar nosso sistema! Tenha um ótimo dia!");
+            default:
+            puts("Opção inválida!\n");
+        }
 
+      }while(escolha_fim != 9);
+      puts("Obrigado por utilizar nosso sistema! Tenha um ótimo dia!");
     }
-
     return 0;
 }
 
+/*
 //for de calculos do banco
 void funcao_testeBanco(){
   for(z = 0; z < 4; z++){
@@ -287,3 +340,4 @@ void testeComSwitch(){
       }
 
     }
+*/
