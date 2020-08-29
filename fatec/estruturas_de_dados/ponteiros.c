@@ -9,5 +9,7 @@ int main() {
     printf("Conteudo de var: %d\n", var);
     printf("Endereco de var: %p\n", &var);
     printf("Conteudo de ponteiro: %p\n", ponteiro); //printa o endereço onde PONTEIRO está apontando. Ou seja, o mesmo endereço de VAR.
-    
+
+    return 0;
+
 }
